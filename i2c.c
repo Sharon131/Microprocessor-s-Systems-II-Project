@@ -96,5 +96,4 @@ void I2C0_IRQHandler(void)
 		status = 1; //clears flag when byte has been sent
 	} 
 }
-	
-	
+

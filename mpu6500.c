@@ -6,7 +6,7 @@ void initialize_mpu(void)
 		initialize_iic();
 }
 	
-void read_mpu(struct mpu6500* data)
+void read_mpu(uint8_t* data)
 {
 		read_iic(0x68,59,6,(uint8_t*)data);
 		read_iic(0x68,67,6,(uint8_t*)(data+6));

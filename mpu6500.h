@@ -10,4 +10,4 @@ struct mpu6500{
 };
 
 void initialize_mpu(void);
-void read_mpu(struct mpu6500* data);
+void read_mpu(uint8_t* data);
