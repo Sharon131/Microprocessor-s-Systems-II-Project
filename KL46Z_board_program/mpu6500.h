@@ -9,5 +9,6 @@ struct mpu6500{
 	uint16_t gyro_Z;
 };
 
+
 void initialize_mpu(void);
 void read_mpu(uint8_t* data);

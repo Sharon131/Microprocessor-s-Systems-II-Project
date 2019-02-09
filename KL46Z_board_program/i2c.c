@@ -14,14 +14,14 @@ void initialize_iic(void)
 		PORTC->PCR[8] = PORT_PCR_MUX(2); //alternate pin func
 		PORTC->PCR[9] = PORT_PCR_MUX(2);
 	
-		NVIC_SetPriority(I2C0_IRQn_NBR, 2);		//i dont kno
+		NVIC_SetPriority(I2C0_IRQn_NBR, 2);		
 		NVIC_ClearPendingIRQ(I2C0_IRQn_NBR);
 		NVIC_EnableIRQ(I2C0_IRQn_NBR);	
 }
 
 //uint8_t dev_addr -> i2c device address
-//uint8_t reg_addr -> register address to be red
-//uint8_t nbr_bytes-> number of bytes to be red
+//uint8_t reg_addr -> register address to be read
+//uint8_t nbr_bytes-> number of bytes to be read
 //uint8_t * point		-> pointer to an array where data is to be stored
 
 void read_iic(uint8_t dev_addr, uint8_t reg_addr, uint8_t nbr_bytes, uint8_t * point)
@@ -30,28 +30,28 @@ void read_iic(uint8_t dev_addr, uint8_t reg_addr, uint8_t nbr_bytes, uint8_t * p
 	I2C0->C1 |=I2C_C1_MST_MASK;	//start condition
 
 	I2C0->D = (dev_addr<<1); //send slave addr in write mode
-	delay(); //wait until interrupt clears flag
+	wait_for_acknowledgement(); //wait until interrupt clears flag
 
 	I2C0->D = reg_addr;	//write slave addr
-	delay();
+	wait_for_acknowledgement();
 	
 	I2C0->C1 |=I2C_C1_RSTA_MASK;	//restart cond
 	I2C0->D = (dev_addr<<1)|1;	//send slave addr in read mode
-	delay();
+	wait_for_acknowledgement();
 
 	I2C0->C1 &=~I2C_C1_TX_MASK;	//master configured in rx mode
 	for(int32_t i=0;i<nbr_bytes;i++)
 	{
 		if(i==nbr_bytes-1)I2C0->C1 |=I2C_C1_TXAK_MASK;	//last byte must be without ack
-		if(i)*(point+i-1) = I2C0->D;else I2C0->D;	//you ave to read data from buffer to start reading data from slave, therefore first byte is garbage
-		delay();
+		if(i)*(point+i-1) = I2C0->D;else I2C0->D;	//you have to read data from buffer to start reading data from slave, therefore first byte is garbage
+		wait_for_acknowledgement();
 	}
 
 
 	I2C0->C1 &=~I2C_C1_MST_MASK;	//first stop transmission in order not to transmit last byte
 	*(point+nbr_bytes-1)=I2C0->D; //read last byte 
 	I2C0->C1 &=~I2C_C1_TXAK_MASK;
-	delay();
+	wait_for_acknowledgement();
 }
 
 //uint8_t dev_addr -> i2c device address
@@ -65,24 +65,21 @@ void write_iic(uint8_t dev_addr, uint8_t reg_addr, uint8_t nbr_bytes, uint8_t * 
 	I2C0->C1 |=I2C_C1_MST_MASK;	//start condition
 
 	I2C0->D = (dev_addr<<1); //send slave addr in write mode
-	delay(); //wait until interrupt clears flag
+	wait_for_acknowledgement(); //wait until interrupt clears flag
 
 	I2C0->D = reg_addr;	//write slave addr
-	delay();
+	wait_for_acknowledgement();
 	
-
 	for(int32_t i=0;i<nbr_bytes;i++)
 	{
-
 		I2C0->D = *(point+i);
-		delay();
+		wait_for_acknowledgement();
 	}
 
-
 	I2C0->C1 &=~I2C_C1_MST_MASK;	//first stop transmission in order not to transmit last byte
-	delay();
+	wait_for_acknowledgement();
 }
-void delay(void)
+void wait_for_acknowledgement(void)
 {
 	while(!status);
 	status=0;
