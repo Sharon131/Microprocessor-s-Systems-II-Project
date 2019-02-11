@@ -17,8 +17,8 @@ Pins of FRDM-KL46Z board and MPU-6500 module should be connected in the followin
 Plug USB ending to computer and micro USB ending to OpenSDA socket in KL46Z board.
 
 ### Software
-First of all, we need to program FRDM-KL46Z board. For that, you can use Keil software.
-Next, run program from folder computer_program on your computer to see plots. You may want to press RESET on KL46Z board to make sure that data from accelerometer and gyroscope are sent to computer.
+First of all, we need to program FRDM-KL46Z board. For that, you can use Keil software. Before programing FRDM-KL46Z board, change variable CLOCK_SETUP to 2 in system_MKL46Z4.c file.     
+Next, run program from folder computer_program on your computer to see plots. You may want to press RESET on KL46Z board to make sure that data from accelerometer and gyroscope are sent to computer. Plot should be shown in less than a minute.
 
 ## Status
 Currently not developed. Works on this project has finished.
